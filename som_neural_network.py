@@ -1,5 +1,6 @@
 """**************Self Organizing Maps for Dimensionality Reduction******************"""
 - http://stats.stackexchange.com/questions/22774/dimensionality-reduction-using-self-organizing-map
+-http://stats.stackexchange.com/questions/64659/using-self-organizing-maps-for-dimensionality-reduction?noredirect=1&lq=1
 import numpy as np
 from sklearn import datasets
 import copy
