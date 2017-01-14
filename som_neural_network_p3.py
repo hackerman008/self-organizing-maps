@@ -1,5 +1,6 @@
 """som prototype 2"""
 """**************Self Organizing Maps for Dimensionality Reduction******************"""
+#https://pdfs.semanticscholar.org/66dc/6eced72816d8cc51cbbb465d8c882a2d3e03.pdf
 
 import numpy as np
 import pandas as pd
