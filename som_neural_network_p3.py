@@ -1,6 +1,7 @@
 """som prototype 2"""
 """**************Self Organizing Maps for Dimensionality Reduction******************"""
 # http://ivape3.blogs.uv.es/2015/03/15/self-organizing-maps-the-kohonens-algorithm-explained/
+#https://notendur.hi.is//~benedikt/Courses/Mia_report2.pdf
 import numpy as np
 import pandas as pd
 from sklearn import datasets
