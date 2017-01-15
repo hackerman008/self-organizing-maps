@@ -1,7 +1,6 @@
 """som prototype 2"""
 """**************Self Organizing Maps for Dimensionality Reduction******************"""
-#https://pdfs.semanticscholar.org/66dc/6eced72816d8cc51cbbb465d8c882a2d3e03.pdf
-
+# http://ivape3.blogs.uv.es/2015/03/15/self-organizing-maps-the-kohonens-algorithm-explained/
 import numpy as np
 import pandas as pd
 from sklearn import datasets
@@ -28,7 +27,7 @@ class SOM(object):
         else:
             self.__iterations = iterations
         if learning_rate == None:
-            self.__learning_rate = 0.5
+            self.__learning_rate = 1
         else:
             self.__learning_rate = learning_rate
         if seed == None:
@@ -37,21 +36,21 @@ class SOM(object):
             rand_generator = np.random.RandomState(seed)
         #int((max(5,4))/2.0)
         self.__map_radius = round(max(self.__m, self.__n)/2)
-        self.__lambda = self.__iterations/self.__map_radius
-    
+        #self.__lambda = self.__iterations/self.__map_radius
+        self.__lambda = 1500
         self.original_map_weight_vectors = rand_generator.rand(self.__m, self.__n, self.__dim)
         #self.map_with_weight_vectors = rand_generator.rand(self.__m, self.__n, self.__dim)
         self.map_with_weight_vectors = copy.deepcopy(self.original_map_weight_vectors)
 
     def print_variables(self):
         """printing variables"""
-        print "m =", self.__m, "\tn =", self.__n
-        print "dimensions of the input vector = ", self.__dim
-        print "learning rate = ", self.__learning_rate
-        print "no of iterations =", self.__iterations
-        print "map radius = ", self.__map_radius
-        print "lambda = ", self.__lambda
-        print "map shape = ", self.map_with_weight_vectors.shape
+        print("m =", self.__m, "\tn =", self.__n)
+        print("dimensions of the input vector = ", self.__dim)
+        print("learning rate = ", self.__learning_rate)
+        print("no of iterations =", self.__iterations)
+        print("map radius = ", self.__map_radius)
+        print("lambda = ", self.__lambda)
+        print("map shape = ", self.map_with_weight_vectors.shape)
 
     '''
     def initialize_weights(self,m,n,dim):
@@ -81,7 +80,7 @@ class SOM(object):
 
     def find_radius_of_the_neighborhood(self, time_value):
         """find the radius of the neighborhood for the current time value"""        
-        radius_of_the_neighborhood = self.__map_radius*(np.exp(-time_value/self.__lambda))
+        radius_of_the_neighborhood = self.__map_radius*(np.exp(-(time_value/self.__lambda)))
         return radius_of_the_neighborhood
         
     def update_weights(self,bmu_index,input_vector,time_step):
@@ -90,16 +89,17 @@ class SOM(object):
             for j in range(self.__n):
                 #print "for node [%d,%d]"%(i,j)
                 index=[i,j]
-                print "for node=",index
-                self.map_with_weight_vectors[i][j] = self.map_with_weight_vectors[i][j] + (self.learning_rate(time_step) * self.calculate_neighborhoood(bmu_index,np.array(index),time_step)*(input_vector - self.map_with_weight_vectors[i][j]))                         
+                print("for node=",index)
+                a = self.learning_rate(time_step)
+                self.map_with_weight_vectors[i][j] = self.map_with_weight_vectors[i][j] + (a * self.calculate_neighborhoood(bmu_index,np.array(index),time_step)*(input_vector - self.map_with_weight_vectors[i][j]))                         
                     
         return 0
 
     def learning_rate(self,time_step):
         """calculate the learning rate"""
         
-        alpha = self.__learning_rate*(np.exp(-(time_step/self.__lambda)))
-        print "learning rate=",alpha        
+        alpha = self.__learning_rate*(np.exp(-(time_step/self.__lambda)))        
+        print("learning rate=",alpha)        
         #print "alpha=",alpha
         return alpha
 
@@ -108,9 +108,9 @@ class SOM(object):
         
         distance = euclidean(bmu_index,current_node_index)
         radius_of_the_neighborhood = self.find_radius_of_the_neighborhood(time_step)
-        theta = np.exp(-distance**2/2*(radius_of_the_neighborhood)**2)
-        print "neighborhood function value =",theta
-        print "radius of the neighborhood=",radius_of_the_neighborhood        
+        theta = np.exp(-(distance**2/(2*(radius_of_the_neighborhood)**2)))
+        print("neighborhood function value =",theta)
+        print("radius of the neighborhood=",radius_of_the_neighborhood)        
         #print "theta=",theta
         return theta
 
@@ -119,15 +119,21 @@ class SOM(object):
         #self.array_of_node_with_weights = self.initialize_weights(self.__m,self.__n,self.__dim)
 
         t = 0
-        while t < 500:
-            print "************************"
-            print "timestep =",t
+        while t < self.__iterations:
+            print("*********************************************************\n*******************************************")
+            print("timestep =",t)
             #pick a random sample
             sample_index = np.random.randint(len(data))
             #print "for iteration ", t, " data = ", data[sample_index], "index = ", sample_index
             self.bmu,self.bmu_index = self.find_bmu(data[sample_index]) #returns index of bmu node
             #print "bmu weights=",self.bmu
-            print "bmu index=",self.bmu_index
+            print("bmu index=",self.bmu_index)
+            """learning rate should not go below 0.01 in first phase and
+                radius of the neighborhood should not go below 0 ever."""
+            if self.learning_rate(t) < 0.01:
+                break
+            elif self.find_radius_of_the_neighborhood(t) <= 0:
+                break
             self.update_weights(self.bmu_index,data[sample_index],t)
             t += 1
         return 0
@@ -198,11 +204,11 @@ class SOM(object):
 
 if __name__ == "__main__":
     
-    som = SOM(18, 18, 64, seed=2)
+    som = SOM(25, 25, 64,iterations = 1500, seed=2)
     som.print_variables()
     
-    #iris = datasets.load_iris()
-    #iris_data = iris.data
+    iris = datasets.load_iris()
+    iris_data = iris.data
     
     digits = datasets.load_digits()
     digits_data = digits.data
@@ -211,18 +217,12 @@ if __name__ == "__main__":
     som.train(digits_data)
     """
     for i in range(149):
-        weight, index = som.best_matching_node(digits_data[i,:])
+        weight, index = som.best_matching_node(iris_data[i,:])
         print "index=",index,"for data=",i
         #,"and target=",digits.target[i]
     """ 
-    print som.topographic_error(digits_data)
-    print som.quantization_error(digits_data)
+    print(som.topographic_error(digits_data))
+    print(som.quantization_error(digits_data))
    
     #print "original map=\n",som.original_map_weight_vectors
     #print "map after training=\n",som.map_with_weight_vectors    
-
-    
-
-
-
-    
