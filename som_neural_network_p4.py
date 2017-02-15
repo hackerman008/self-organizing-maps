@@ -374,30 +374,20 @@ if __name__ == "__main__":
     from sklearn import preprocessing
     iris_data = preprocessing.scale(iris_data)
     som.train(iris_data)
-    list_of_columns=['one','two','three','four']
-    list_of_node_and_input = som.dataframe_with_bmu_for_each_input_vector(iris_data, list_of_columns, flag=1)
-    df, temp_list_to_store_clusters=som.create_datasets(iris_data, 4, list_of_columns, list_of_node_and_input)
     
-    """
-    digits = datasets.load_digits()
-    digits_data = digits.data
-    from sklearn import preprocessing
-    iris_data = preprocessing.scale(iris_data)
-    som.train(iris_data)
-    
+    #find the best matching node for each data point
     for i in range(len(iris_data)):
         weight, index = som.best_matching_node(iris_data[i,:])
         print "index=",index,"for data=",i
         #,"and target=",digits.target[i]
-    
+        
+    #print the topographic error ad quantization error
     print(som.topographic_error(iris_data))
     print(som.quantization_error(iris_data))
-    #df.to_csv(r"D:\MainRepo\Indicators\som_test__csv_exp.csv",index=False)
-    dataframe_with_bmu_and_indicator = pd.read_csv(r"D:\MainRepo\Indicators\som_test__csv_exp.csv")
-    df2 = som.dataframe_with_bmu_for_each_input_vector_and_distance(dataframe_with_bmu_and_indicator)
-    df2.to_csv(r"D:\MainRepo\Indicators\som_test__csv_exp_distance.csv",index=False)
-          
-    #som.train(iris_data)
-    #print "original map=\n",som.original_map_weight_vectors
-    #print "map after training=\n",som.map_with_weight_vectors    
-    """
+    
+    #create different datasets , each data set contains samples from each cluster ,this dataset can be used for cross validation
+    #and since the datasets will hav same statistical properties.
+    list_of_columns=['one','two','three','four']
+    list_of_node_and_input = som.dataframe_with_bmu_for_each_input_vector(iris_data, list_of_columns, flag=1)
+    df, temp_list_to_store_clusters=som.create_datasets(iris_data, 4, list_of_columns, list_of_node_and_input)
+  
