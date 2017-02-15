@@ -1,7 +1,5 @@
-"""som prototype 2"""
 """**************Self Organizing Maps for Dimensionality Reduction******************"""
-# http://ivape3.blogs.uv.es/2015/03/15/self-organizing-maps-the-kohonens-algorithm-explained/
-#https://notendur.hi.is//~benedikt/Courses/Mia_report2.pdf
+
 import numpy as np
 import pandas as pd
 from sklearn import datasets
@@ -12,7 +10,6 @@ import sklearn.metrics.pairwise as pair_wise
 from ast import literal_eval
 from itertools import groupby
 from operator import itemgetter
-
 
 class SOM(object):
     """initialize the newural network parameters
@@ -94,7 +91,6 @@ class SOM(object):
         print("lambda = ", self.__lambda)
         print("map shape = ", self.map_with_weight_vectors.shape)
         print("weight initialization type = ",self.__initialization_type)
-
 
     def find_bmu(self, input_vector):
         """find the best matching unit and return the index of the 
